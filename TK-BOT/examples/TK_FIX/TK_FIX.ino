@@ -57,17 +57,18 @@ char serialRead;
 
 // Vairiable of the module and sensor.
 #define VERSION 0
-#define TEMPERATURE_SENSOR 2
-#define POTENTIONMETER 4
-#define JOYSTICK 5
+#define MOTOR 1
+#define JOYSTICK 2
+#define SERVO 3
+#define ULTRASONIC_ARDUINO 10
+#define POTENTIONMETER 11
+#define AVOID_SENSOR 12 
+#define TOUCH_SENSOR 13
+#define TEMPERATURE_SENSOR 14
+#define GASSENSOR 15
+#define LINEFOLLOWER 16
 #define DCMOTOR 6
-#define MOTOR 10
-#define SERVO 11
-#define LINEFOLLOWER 17
-#define GASSENSOR 25
-#define ULTRASONIC_ARDUINO 36
-#define TOUCH_SENSOR 51
-#define AVOID_SENSOR 52 
+
 
 // Created to variable.
 #define GET 1
@@ -124,7 +125,7 @@ void loop(){
   }
 }
 unsigned char readBuffer(int index){
- return isBluetooth?buffer[index]:bufferBt[index]; 
+  return isBluetooth?buffer[index]:bufferBt[index]; 
 }
 void readSerial(){
   isAvailable = false;
@@ -135,21 +136,14 @@ void readSerial(){
   } 
 }
 void writeBuffer(int index,unsigned char c){
- if(isBluetooth){
-  buffer[index]=c;
- }else{
-  bufferBt[index]=c;
- } 
-}
-void writeHead(){
-  writeSerial(0xff);
-  writeSerial(0x55);
-}
-void writeEnd(){
-  Serial.println(); 
+  if(isBluetooth){
+    buffer[index]=c;
+  }else{
+    bufferBt[index]=c;
+  } 
 }
 void writeSerial(unsigned char c){
- Serial.write(c);
+  Serial.write(c);
 }
 /*
 ff 55 len idx action device port  slot  data a
@@ -165,16 +159,13 @@ void parseData(){
   switch(action){
     case GET:{
         // if(device != ULTRASONIC_ARDUINO){
-        //   writeHead();
         //   writeSerial(idx);
         // }
         readSensor(device);
-        //writeEnd();
      }
      break;
      case RUN:{
        runModule(device);
-      // callOK();
      }
       break;
       case RESET:{
@@ -183,20 +174,13 @@ void parseData(){
         dc.run(0);
         dc.reset(M2);
         dc.run(0);
-        // callOK();
       }
      break;
      case START:{
         //start
-        // callOK();
       }
      break;
   }
-}
-void callOK(){
-    writeSerial(0xff);
-    writeSerial(0x55);
-    writeEnd();
 }
 /*
 inbyte
@@ -205,8 +189,10 @@ TouchData:1
 AvoidData:2
 Buton:4
 */ 
-void sendByte(char c, int intbyte){
-  writeSerial(intbyte);
+void sendByte(char c, char name, char name1, int port){
+  writeSerial(name);
+  writeSerial(name1);
+  writeSerial(port);
   writeSerial(c);
 }
 void sendString(String s){
@@ -217,28 +203,33 @@ void sendString(String s){
     writeSerial(s.charAt(i));
   }
 }
-void sendFloat(float value, int ten){ 
-    writeSerial(0xff);
-     writeSerial(ten);
-     val.floatVal = value;
-     writeSerial(val.byteVal[0]);
-     writeSerial(val.byteVal[1]);
-     writeSerial(val.byteVal[2]);
-     writeSerial(val.byteVal[3]);
+void sendFloat(float value, char name, char name1, int port){ 
+    val.floatVal = value;
+    writeSerial(name);
+    writeSerial(name1);
+    writeSerial(port);
+    writeSerial(val.byteVal[0]);
+    writeSerial(val.byteVal[1]);
+    writeSerial(val.byteVal[2]);
+    writeSerial(val.byteVal[3]);
 }
-void sendShort(double value){
-     writeSerial(3);
-     valShort.shortVal = value;
-     writeSerial(valShort.byteVal[0]);
-     writeSerial(valShort.byteVal[1]);
+void sendShort(double value, char name, char name1, int port){
+    valShort.shortVal = value;
+    writeSerial(name);
+    writeSerial(name1);
+    writeSerial(port);
+    writeSerial(valShort.byteVal[0]);
+    writeSerial(valShort.byteVal[1]);
 }
-void sendDouble(double value){
-     writeSerial(2);
-     valDouble.doubleVal = value;
-     writeSerial(valDouble.byteVal[0]);
-     writeSerial(valDouble.byteVal[1]);
-     writeSerial(valDouble.byteVal[2]);
-     writeSerial(valDouble.byteVal[3]);
+void sendDouble(double value, char name, char name1, int port){
+    valDouble.doubleVal = value;
+    writeSerial(name);
+    writeSerial(name1);
+    writeSerial(port);
+    writeSerial(valDouble.byteVal[0]);
+    writeSerial(valDouble.byteVal[1]);
+    writeSerial(valDouble.byteVal[2]);
+    writeSerial(valDouble.byteVal[3]);
 }
 short readShort(int idx){
   valShort.byteVal[0] = readBuffer(idx);
@@ -325,14 +316,12 @@ void readSensor(int device){
   port = readBuffer(6);
   pin = port;
   switch(device){
-   case  ULTRASONIC_ARDUINO:{
-     if(usB.getPort()!=port){
-       usB.reset(port);
-     }
-     value = usB.distanceCm();     
-    //  writeHead();
-    //  writeSerial(command_index);     
-     sendFloat(value,22);
+    case  ULTRASONIC_ARDUINO:{
+      if(usB.getPort()!=port){
+        usB.reset(port);
+      }
+      value = usB.distanceCm();     
+      sendFloat(value,'a','a', port);
      
    }
    break;
@@ -342,7 +331,7 @@ void readSensor(int device){
        ts.reset(port,slot);
      }
      value = ts.temperature();
-     sendFloat(value,11);
+     sendFloat(value,'t','e', port);
    }
    break;
     case TOUCH_SENSOR:
@@ -350,7 +339,7 @@ void readSensor(int device){
      if(touchSensor.getPort() != port){
        touchSensor.reset(port);
      }
-     sendByte(touchSensor.touched(),1);
+     sendByte(touchSensor.touched(),'a','t', port);
    }
    break;
   case AVOID_SENSOR:
@@ -358,7 +347,7 @@ void readSensor(int device){
      if(avoidSensor.getPort() != port){
        avoidSensor.reset(port);
      }
-     sendByte(avoidSensor.Avoidtested(),2);
+     sendByte(avoidSensor.Avoidtested(),'a','v', port);
    }
    break;
   case GASSENSOR:{
@@ -368,7 +357,7 @@ void readSensor(int device){
      }
      int16_t GasData; 
      GasData = GasSensor.readAnalog();
-     sendShort(GasData);
+     sendShort(GasData, 'g', 's', port );
    }
   break;
   case  LINEFOLLOWER:{
@@ -378,8 +367,7 @@ void readSensor(int device){
          pinMode(generalDevice.pin2(),INPUT);
      }
      value = generalDevice.dRead1()*2+generalDevice.dRead2();
-     Serial.println(value);
-     sendFloat(value,17);
+     sendFloat(value,'f', 'w', port);
    }
    break;
    case  POTENTIONMETER:{
@@ -388,7 +376,7 @@ void readSensor(int device){
        pinMode(generalDevice.pin2(),INPUT);
      }
      value = generalDevice.aRead2();
-     sendFloat(value,12);
+     sendFloat(value,'p', 'p', port);
    }
    break;
   }
