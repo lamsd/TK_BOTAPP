@@ -145,6 +145,10 @@ void writeBuffer(int index,unsigned char c){
 void writeSerial(unsigned char c){
   Serial.write(c);
 }
+void writeHead(){
+  writeSerial(0xff);
+  writeSerial(0x55);
+}
 /*
 ff 55 len idx action device port  slot  data a
 0  1  2   3   4      5      6     7     8
@@ -177,7 +181,6 @@ void parseData(){
       }
      break;
      case START:{
-        //start
       }
      break;
   }
@@ -190,21 +193,15 @@ AvoidData:2
 Buton:4
 */ 
 void sendByte(char c, char name, char name1, int port){
+  writeHead();
   writeSerial(name);
   writeSerial(name1);
   writeSerial(port);
   writeSerial(c);
 }
-void sendString(String s){
-  int l = s.length();
-  writeSerial(4);
-  writeSerial(l);
-  for(int i=0;i<l;i++){
-    writeSerial(s.charAt(i));
-  }
-}
 void sendFloat(float value, char name, char name1, int port){ 
     val.floatVal = value;
+    writeHead();
     writeSerial(name);
     writeSerial(name1);
     writeSerial(port);
@@ -215,6 +212,7 @@ void sendFloat(float value, char name, char name1, int port){
 }
 void sendShort(double value, char name, char name1, int port){
     valShort.shortVal = value;
+    writeHead();
     writeSerial(name);
     writeSerial(name1);
     writeSerial(port);
@@ -223,6 +221,7 @@ void sendShort(double value, char name, char name1, int port){
 }
 void sendDouble(double value, char name, char name1, int port){
     valDouble.doubleVal = value;
+    writeHead();
     writeSerial(name);
     writeSerial(name1);
     writeSerial(port);
