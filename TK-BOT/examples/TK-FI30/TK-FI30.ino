@@ -145,10 +145,6 @@ void writeBuffer(int index,unsigned char c){
 void writeSerial(unsigned char c){
   Serial.write(c);
 }
-void writeHead(){
-  writeSerial(0xff);
-  writeSerial(0x55);
-}
 /*
 ff 55 len idx action device port  slot  data a
 0  1  2   3   4      5      6     7     8
@@ -193,7 +189,6 @@ AvoidData:2
 Buton:4
 */ 
 void sendByte(char c, char name, char name1, int port){
-  writeHead();
   writeSerial(name);
   writeSerial(name1);
   writeSerial(port);
@@ -201,7 +196,6 @@ void sendByte(char c, char name, char name1, int port){
 }
 void sendFloat(float value, char name, char name1, int port){ 
     val.floatVal = value;
-    writeHead();
     writeSerial(name);
     writeSerial(name1);
     writeSerial(port);
@@ -212,24 +206,13 @@ void sendFloat(float value, char name, char name1, int port){
 }
 void sendShort(double value, char name, char name1, int port){
     valShort.shortVal = value;
-    writeHead();
     writeSerial(name);
     writeSerial(name1);
     writeSerial(port);
     writeSerial(valShort.byteVal[0]);
     writeSerial(valShort.byteVal[1]);
 }
-void sendDouble(double value, char name, char name1, int port){
-    valDouble.doubleVal = value;
-    writeHead();
-    writeSerial(name);
-    writeSerial(name1);
-    writeSerial(port);
-    writeSerial(valDouble.byteVal[0]);
-    writeSerial(valDouble.byteVal[1]);
-    writeSerial(valDouble.byteVal[2]);
-    writeSerial(valDouble.byteVal[3]);
-}
+
 short readShort(int idx){
   valShort.byteVal[0] = readBuffer(idx);
   valShort.byteVal[1] = readBuffer(idx+1);
@@ -319,9 +302,31 @@ void readSensor(int device){
       if(usB.getPort()!=port){
         usB.reset(port);
       }
-      value = usB.distanceCm();     
-      sendFloat(value,'a','a', port);
-     
+      value = usB.distanceCm(); 
+      if (port  == 2){
+        value = usB.distanceCm(); 
+        sendFloat(value,'a','a', 2);
+      } 
+      else if (port  == 3){
+        value = usB.distanceCm(); 
+        sendFloat(value,'a','a', 3);
+      } 
+      else if (port  == 5){
+        value = usB.distanceCm(); 
+        sendFloat(value,'a','a', 5);
+      } 
+      else if (port  == 6){
+        value = usB.distanceCm(); 
+        sendFloat(value,'a','a', 6);
+      } 
+     else  if (port  == 7){
+        value = usB.distanceCm(); 
+        sendFloat(value,'a','a', 7);
+      } 
+      else if (port  == 8){
+        value = usB.distanceCm(); 
+        sendFloat(value,'a','a', 8);
+      }
    }
    break;
    case  TEMPERATURE_SENSOR:{
@@ -335,17 +340,10 @@ void readSensor(int device){
    break;
     case TOUCH_SENSOR:
    {
-//     if(touchSensor.getPort() != port){
-//       touchSensor.reset(port);
-//     }
-//     sendByte(touchSensor.touched(),'a','t', port);
-writeSerial(0xff);
-writeSerial(0x55);
-writeSerial(0x61);
-writeSerial(0x74);
-writeSerial(0x02);
-writeSerial(0x00);
-
+     if(touchSensor.getPort() != port){
+       touchSensor.reset(port);
+     }
+     sendByte(touchSensor.touched(),'a','t', port);
    }
    break;
   case AVOID_SENSOR:
