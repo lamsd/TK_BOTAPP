@@ -1,8 +1,8 @@
 /**
 
  * Function List:
- * 1. void buzzerOn()
- * 2. void buzzerOff()
+ * 1. void tone(frequency, duration)
+ * 2. void noTone()
  
  */
 

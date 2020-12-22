@@ -16,6 +16,7 @@
 #include "TKSerial.h"
 #include "TKBluetooth.h"
 #include "TKTemperature.h"
+#include "TKTemperatureTh.h"
 #include "TKTouchSensor.h"
 #include "TKAvoidSensor.h"
 #include "TKBuzzer.h"

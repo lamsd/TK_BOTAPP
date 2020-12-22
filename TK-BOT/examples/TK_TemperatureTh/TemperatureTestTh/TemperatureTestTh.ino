@@ -4,7 +4,7 @@
  */
 #include "TKOrion.h"
 
-TKTemperature myTemp(PORT_2, SLOT2);
+TKTemperatureTh myTemp(PORT_2, SLOT1);
 
 void setup()
 {

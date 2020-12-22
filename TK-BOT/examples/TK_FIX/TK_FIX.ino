@@ -16,6 +16,7 @@ TKUltrasonicSensorB usB;
 TKGasSensor GasSensor;
 TKTouchSensor touchSensor;
 TKPort generalDevice;
+TKBuzzer buTK;
  
 typedef struct TKModule
 {
@@ -60,6 +61,9 @@ char serialRead;
 #define MOTOR 1
 #define JOYSTICK 2
 #define SERVO 3
+#define BUZZER 4
+
+
 #define ULTRASONIC_ARDUINO 10
 #define POTENTIONMETER 11
 #define AVOID_SENSOR 12 
@@ -274,6 +278,16 @@ void runModule(int device){
      }
    }
    break;
+   case BUZZER:{
+     int frequence = readShort(6);
+     int durations = readShort(8);
+     if (durations == 0){
+       buTK.noTone();
+     }else{
+      buTK.tone(frequence, durations);
+     }
+   }
+   break;
   }
 }
 int searchServoPin(int pin){
@@ -364,7 +378,7 @@ void readSensor(int device){
          pinMode(generalDevice.pin1(),INPUT);
          pinMode(generalDevice.pin2(),INPUT);
      }
-     value = generalDevice.dRead1()*2+generalDevice.dRead2();
+    value1 = generalDevice.dRead1()*2+generalDevice.dRead2();
      sendFloat(value,'f', 'w', port);
    }
    break;
