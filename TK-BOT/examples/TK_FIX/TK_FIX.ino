@@ -279,12 +279,16 @@ void runModule(int device){
    }
    break;
    case BUZZER:{
-     int frequence = readShort(6);
-     int durations = readShort(8);
+      int slot = readBuffer(7);
+     if(slot == 1){
+      pin = mePort[port].s1;
+      }
+     int frequence = readShort(8);
+     int durations = readShort(10);
      if (durations == 0){
        buTK.noTone();
      }else{
-      buTK.tone(frequence, durations);
+      buTK.tone(pin , frequence, durations);
      }
    }
    break;
@@ -378,7 +382,7 @@ void readSensor(int device){
          pinMode(generalDevice.pin1(),INPUT);
          pinMode(generalDevice.pin2(),INPUT);
      }
-    value1 = generalDevice.dRead1()*2+generalDevice.dRead2();
+    value = generalDevice.dRead1()*2+generalDevice.dRead2();
      sendFloat(value,'f', 'w', port);
    }
    break;
