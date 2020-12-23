@@ -17,6 +17,7 @@ TKGasSensor GasSensor;
 TKTouchSensor touchSensor;
 TKPort generalDevice;
 TKBuzzer buTK;
+TKButton btTK;
  
 typedef struct TKModule
 {
@@ -71,6 +72,7 @@ char serialRead;
 #define TEMPERATURE_SENSOR 14
 #define GASSENSOR 15
 #define LINEFOLLOWER 16
+#define BUTTON_MODULE 17
 #define DCMOTOR 6
 
 
@@ -364,6 +366,14 @@ void readSensor(int device){
        avoidSensor.reset(port);
      }
      sendByte(avoidSensor.Avoidtested(),'a','v', port);
+   }
+   break;
+   case BUTTON_MODULE:
+   {
+     if(btTK.getPort() != port){
+       btTK.reset(port);
+     }
+     sendByte(btTK.tkpressed(),'b','t', port);
    }
    break;
   case GASSENSOR:{

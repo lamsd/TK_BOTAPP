@@ -6,6 +6,7 @@
 #include "TKConfig.h"
 
 // Supported Modules drive needs to be added here
+#include "TKButton.h"
 #include "TKUltrasonicSensor.h"
 #include "TKUltrasonicSensorB.h"
 #include "TKDCMotor.h"
