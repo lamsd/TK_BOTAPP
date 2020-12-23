@@ -18,6 +18,7 @@ TKTouchSensor touchSensor;
 TKPort generalDevice;
 TKBuzzer buTK;
 TKButton btTK;
+TKLightSensor lightTK;
  
 typedef struct TKModule
 {
@@ -73,6 +74,7 @@ char serialRead;
 #define GASSENSOR 15
 #define LINEFOLLOWER 16
 #define BUTTON_MODULE 17
+#define LIGHT_SENSOR 18
 #define DCMOTOR 6
 
 
@@ -403,6 +405,15 @@ void readSensor(int device){
      }
      value = generalDevice.aRead1();
      sendFloat(value,'p', 'p', port);
+   }
+   break;
+   case LIGHT_SENSOR:{
+    if(lightTK.getPort()!=port){
+      lightTK.reset(port);
+      // pinMode(lightTK.pin2(), INPUT);
+    }
+    value = lightTK.read();
+    sendFloat(value, 'l', 'i', port); 
    }
    break;
   }

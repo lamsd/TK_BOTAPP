@@ -19,6 +19,7 @@
 #include "TKTemperature.h"
 #include "TKTemperatureTh.h"
 #include "TKTouchSensor.h"
+#include "TKLightSensor.h"
 #include "TKAvoidSensor.h"
 #include "TKBuzzer.h"
 #include "TKGasSensor.h"
